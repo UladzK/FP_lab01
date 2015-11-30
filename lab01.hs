@@ -69,11 +69,22 @@ parseArgs :: IO (Int, Float, String, Map.Map String String)
 parseArgs = do
 	args <- getArgs
 
-	let numberOfClusters = read (args !! 0) :: Int
-	let precision = read (args !! 1) :: Float
-	let fileName = args !! 2
+	if (length args < 3)
+		then 
+			error "Not enough arguments. See --help for usage"
+		else
+			return ()
 
-	return (numberOfClusters, precision, fileName, stringsToMap $ drop 3 args)
+	let numberOfClusters = readMaybe (args !! 0) :: Int
+	let precision = readMaybe (args !! 1) :: Float
+	let fileName = Just args !! 2
+
+	--if (isNothing $ sequenceA [numberOfClusters, precision, fileName])
+	--	then
+	--		error "Incorrect mandatory arguments. See --help for usage"
+	--	else
+	--		return ()
+	--return (numberOfClusters, precision, fileName, stringsToMap $ drop 3 args)
 
 main = do
 
