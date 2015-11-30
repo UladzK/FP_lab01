@@ -7,7 +7,9 @@ module Math
 	vectorsSum,
 	matrixNorm,
 	transposeMatrix,
-	rollFraction
+	rollFraction,
+	matrixMax,
+	matrixMin
 ) where
 
 euclideanDistance :: (Floating a) => [a] -> [a] -> a
@@ -26,7 +28,13 @@ vectorsSum :: Num a => [[a]] -> [a]
 vectorsSum = foldl1 (zipWith (+))
 
 matrixNorm :: (Num a, Ord a) => [[a]] -> a
-matrixNorm = maximum . map (maximum) . absMatrix
+matrixNorm = matrixMax . absMatrix
+
+matrixMax :: (Num a, Ord a) => [[a]] -> a
+matrixMax = maximum . map (maximum)
+
+matrixMin :: (Num a, Ord a) => [[a]] -> a
+matrixMin = minimum . map (minimum)
 
 absMatrix :: (Num a) => [[a]] -> [[a]]
 absMatrix = map (map (abs))

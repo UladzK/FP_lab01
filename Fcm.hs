@@ -29,7 +29,7 @@ generateRandomVector g r n = take n $ randomRs r g :: [Float]
 calculateClusters :: [[Float]] -> [[Float]] -> [[Float]]
 calculateClusters xs ws = map (getCluster xs) (transposeMatrix ws)
  	where
-  		getCluster x cws = multNumOnVector (rollFraction $ sum cws) (vectorsWeightSum cws x)
+  		getCluster x cws = multNumOnVector (rollFraction $ sum $ map (^m) cws) (vectorsWeightSum cws x)
   		vectorsWeightSum cws xs = vectorsSum $ zipWith (\w x -> multNumOnVector (w^m) x) cws xs
   		m = 2
 
@@ -55,9 +55,9 @@ classify sm vd nc e xs = getClassifyDistance vd initMatrix e xs
 getClassifyInitMatrix :: StartMethod -> [[Float]] -> Int -> [[Float]]
 getClassifyInitMatrix sm xs nc
 	| sm == Weights = generateFcmInitMatrix (mkStdGen 0) numberOfVectors nc
-	| sm == Clusters = calculateWeights euclideanDistance xs $ getRandomClusters (mkStdGen 100) xs nc
+	| sm == Clusters = calculateWeights euclideanDistance xs $ getRandomClusters (mkStdGen 0) xs nc
 	| otherwise = error "Start method is not supported"
-		where numberOfVectors = length xs		
+		where numberOfVectors = length xs
 
 getClassifyDistance :: VectorDistance -> ([[Float]] -> Float -> [[Float]] -> [[Float]])
 getClassifyDistance d
@@ -66,7 +66,7 @@ getClassifyDistance d
 	| otherwise = error "Distance method is not supported"
 
 getRandomClusters :: StdGen -> [[Float]] -> Int -> [[Float]]
-getRandomClusters g xs nc = [xs !! i | i <- take nc $ randomRs (0, length xs - 1) g]
+getRandomClusters g xs nc = generateRandomMatrix g nc (length $ head xs) (matrixMax xs, matrixMin xs)
 
 generateFcmInitMatrix :: StdGen -> Int -> Int -> [[Float]]
 generateFcmInitMatrix g nv nc = map (adduct) (generateRandomMatrix g nv nc (0, 1))

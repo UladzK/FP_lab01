@@ -26,10 +26,11 @@ stringsToMap xs = Map.fromList $ stringsToMap' xs
 		stringsToMap' (x:[]) = (x, []) : []
 		stringsToMap' (x:xs) = (x, head xs) : stringsToMap' (tail xs)
 
-printResult :: (Show a) => Maybe String -> a -> IO ()
+printResult :: (Show a) => Maybe String -> [a] -> IO ()
 printResult fileName result
-	| Maybe.isNothing fileName = print result
- 	| otherwise = writeFile (fromJust fileName) (show result)
+	| Maybe.isNothing fileName = putStrLn viewResult
+ 	| otherwise = writeFile (fromJust fileName) viewResult
+ 	where viewResult = unlines . map (show) $ result
 
 cutOff :: Bool -> ([a] -> [a]) -> [a] -> [a]
 cutOff p f xs
