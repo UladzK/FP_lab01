@@ -1,15 +1,15 @@
 module Math
 (
-	euclideanDistance,
-	hammingDistance,	
-	multNumOnVector,	
-	subtractMatrices,
-	vectorsSum,
-	matrixNorm,
-	transposeMatrix,
-	rollFraction,
-	matrixMax,
-	matrixMin
+    euclideanDistance,
+    hammingDistance,    
+    multNumOnVector,    
+    subtractMatrices,
+    vectorsSum,
+    matrixNorm,
+    transposeMatrix,
+    rollFraction,
+    matrixMax,
+    matrixMin
 ) where
 
 euclideanDistance :: (Floating a) => [a] -> [a] -> a
