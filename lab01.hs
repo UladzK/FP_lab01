@@ -75,16 +75,25 @@ parseArgs = do
 		else
 			return ()
 
-	let numberOfClusters = readMaybe (args !! 0) :: Int
-	let precision = readMaybe (args !! 1) :: Float
-	let fileName = Just args !! 2
+	let nc = args !! 0
+	let pr = args !! 1
+	let fileName = args !! 2
 
-	--if (isNothing $ sequenceA [numberOfClusters, precision, fileName])
-	--	then
-	--		error "Incorrect mandatory arguments. See --help for usage"
-	--	else
-	--		return ()
-	--return (numberOfClusters, precision, fileName, stringsToMap $ drop 3 args)
+	let numberOfClusters = readMaybe nc :: Maybe Int
+	if (isNothing numberOfClusters)
+		then
+			error $ "Incorrect number of clusters: " ++ nc
+		else
+			return ()
+
+	let precision = readMaybe pr :: Maybe Float
+	if (isNothing precision)
+		then
+			error $ "Incorrect precision of classify: " ++ pr
+		else
+			return ()
+
+	return (fromJust numberOfClusters, fromJust precision, fileName, stringsToMap $ drop 3 args)
 
 main = do
 
@@ -94,12 +103,19 @@ main = do
 	
 	let startMethod = read (Map.findWithDefault "Weights" "-sm" extraArgsMap) :: StartMethod
 	let distanceMethod = read (Map.findWithDefault "Euclidean" "-d" extraArgsMap) :: VectorDistance
-	let csvIgnoreFirstRow = read (Map.findWithDefault "False" "-ifr" extraArgsMap) :: Bool
-	let csvIgnoreLastColumn = read (Map.findWithDefault "False" "-ilc" extraArgsMap) :: Bool
-	let csvIgnoreFirstColumn = read (Map.findWithDefault "False" "-ifc" extraArgsMap) :: Bool
+
+	let csvIgnoreFirstRow = readMaybe (Map.findWithDefault "False" "-ifr" extraArgsMap) :: Maybe Bool
+	let csvIgnoreLastColumn = readMaybe (Map.findWithDefault "False" "-ilc" extraArgsMap) :: Maybe Bool
+	let csvIgnoreFirstColumn = readMaybe (Map.findWithDefault "False" "-ifc" extraArgsMap) :: Maybe Bool
+
+	if (isNothing $ sequenceA [csvIgnoreFirstRow, csvIgnoreLastColumn, csvIgnoreFirstColumn])
+		then
+			error "Incorrect ignore flags for CSV. See --help for usage"
+		else
+			return ()
 
 	csvParsed <- parseCSV csvSeparator
-		(csvIgnoreFirstRow, csvIgnoreFirstColumn, csvIgnoreLastColumn) fileName
+		(fromJust csvIgnoreFirstRow, fromJust csvIgnoreFirstColumn, fromJust csvIgnoreLastColumn) fileName
 
 	let vectors = map (map (\x -> read x :: Float)) csvParsed
 	let classifyResult = classify startMethod distanceMethod numberOfClusters precision vectors
